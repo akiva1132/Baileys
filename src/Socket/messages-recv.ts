@@ -858,7 +858,9 @@ export const makeMessagesRecvSocket = (config: SocketConfig) => {
 					cleanMessage(msg, authState.creds.me!.id)
 
 					await sendMessageAck(node)
-
+					if (msg?.key?.participant?.endsWith('@lid') && node?.attrs?.participant_pn) {
+						msg.key.participant = node.attrs.participant_pn
+					}
 					await upsertMessage(msg, node.attrs.offline ? 'append' : 'notify')
 				})
 			])
