@@ -1,5 +1,5 @@
 import { Boom } from '@hapi/boom'
-import { randomBytes } from 'crypto'
+import { randomBytes, randomInt } from 'crypto'
 import { URL } from 'url'
 import { promisify } from 'util'
 import { proto } from '../../WAProto'
@@ -459,16 +459,9 @@ export const makeSocket = (config: SocketConfig) => {
 		end(new Boom(msg || 'Intentional Logout', { statusCode: DisconnectReason.loggedOut }))
 	}
 
-	const requestPairingCode = async (phoneNumber: string, customPairingCode?: string): Promise<string> => {
-		if (customPairingCode) {
-			if (!/^\d{8}$/.test(customPairingCode)) {
-				throw new Error('Custom pairing code must be exactly 8 digits')
-			}
-			authState.creds.pairingCode = customPairingCode
-		} else {
-			authState.creds.pairingCode = bytesToCrockford(randomBytes(5))
-		}
-		authState.creds.pairingCode = bytesToCrockford(randomBytes(5))
+	const requestPairingCode = async (phoneNumber: string): Promise<string> => {
+		const code = randomInt(10000000, 100000000).toString()
+		authState.creds.pairingCode = code
 		authState.creds.me = {
 			id: jidEncode(phoneNumber, 's.whatsapp.net'),
 			name: '~'
